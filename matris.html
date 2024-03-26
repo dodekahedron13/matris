@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matris</title>
+</head>
+<style type="text/css">
+	body, html {
+		background: #121415;
+		color: orange;
+		font-weight: bold;
+		font-size: 170%;
+		font-family: monospace;
+		cursor: pointer;
+	}
+	input {
+		background: #121415;
+		color: #00ff68;
+		font-weight: bold;
+		font-size: 140%;
+		font-family: monospace;
+		width: 200px;
+		border-radius: 10px;
+		border:none;
+		text-align: center;
+	}
+	input::placeholder {
+		font-size: 20px !important;
+		text-align: center;
+		margin-bottom: 10px;
+	}
+	#main-content {
+		position: relative;
+		margin: auto;
+		width: 500px;
+		height: 500px;
+		margin-top: 3rem;
+	}
+	#arr {
+		width: 275px;
+        height: 300px;
+       	position: relative;
+        margin: auto;
+	}
+	#arr span {
+		transition: 0.5s;
+	}
+	#arr span:hover {
+		background: #00ff68;
+		color: black;
+		border-radius: 100px;
+		padding: 5px;
+	}
+	.row { display: flex; }
+	span {
+		/*
+	    width: 20px;
+	    height: 20px;
+	    border: 1px solid black;
+	    display: inline-block;
+	    text-align: center;
+	    margin: 9px;
+	    */
+	    width: 39px;
+	    text-align: center;
+	}
+	#input-content {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin-top: 21px;
+	}
+	#add-content {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin-top: 10px;
+	}
+	#add {
+		background: orange;
+		color: black;
+		border-radius: 20px;
+		padding: 10px 25px 10px 25px;
+		font-weight: bold;
+		font-size: 70%;
+		border: none;
+		cursor: pointer;
+		transition: 0.2s;
+	}
+	#add:hover { background: #956000 !important }
+	#add:active { letter-spacing: -0.7px }
+	#xY {
+		color: #dfdfdf;
+	}
+	.active {
+		background: green;
+		color: white;
+	}
+</style>
+<body>
+	<div id="main-content">
+		<div id="xY">
+			<small style="position:relative; left:70px; top:125px;">
+			 	<span style="writing-mode: tb;">Satır→</span>
+			</small>
+			&nbsp;&nbsp;&nbsp;→<small>Sütun</small> <br />
+		</div>
+
+		<div id="arr"></div>
+		<br />
+		<div id="input-content">
+			<input type="text"
+			placeholder="Satır Sütun (3x1)"
+			id="indis"
+			style="margin-right: 15px;" />
+			<input type="number"
+			min="0"
+			max="9"
+			placeholder="9-0"
+			id="vl" />
+		</div>
+		<div id="add-content">
+			<button type="button" id="add"> Ekle + </button>
+		</div>		
+	</div>
+</body>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+window.mArray = [
+	[1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,0],
+    [1,1,1,1,1,0,0],
+    [1,1,1,1,0,0,0],
+    [1,1,1,0,0,0,0],
+    [1,1,0,0,0,0,0],
+    [1,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0]
+]; let status = false;
+const arr = document.getElementById("arr");
+
+for (let i = 0; i < mArray.length; i++) { // row
+    let row = document.createElement("div");
+    row.className = "row";
+
+    for (let j = 0; j < mArray[i].length; j++) { // column
+        let cell = document.createElement("span");
+        cell.setAttribute("data-matris", `${i+1}x${j+1}`);
+        cell.setAttribute("data-main", `${i}x${j}`);
+        cell.textContent = mArray[i][j];
+        row.appendChild(cell);
+    }
+
+    arr.appendChild(row);
+    status = true;
+}
+
+$(function() {
+	const alertMessage = () => {
+		console.log(`1) Matris herhangi bir yer seçilsin örn. (3x1)
+2) Matris 0 - 9 gibi bi eleman için rev.`);
+	alert(`
+	1) Matris herhangi bir yer seçilsin örn. (3x1)
+	2) Matris 0 - 9 gibi bi eleman için rev.`);
+	}		
+
+	let interval = setInterval(function() {
+	   if (status === true) {
+	   	alertMessage();
+	   	clearInterval(interval);
+	   }
+	}, 1000);
+	
+	const newMatris = (line, column, vl) => { // vl = value
+		if (!line||!column||vl===null) return false;
+		$(`[data-matris=${line}x${column}]`).text(vl);
+		$("#indis").val(null);
+		$("#vl").val(null);
+	}
+
+	$(document).on("click", "#add", function() {
+		const indis = $("#indis").val() 
+		? $("#indis").val() 
+		: null;
+		const vl = $("#vl").val() ? parseInt(
+			$("#vl").val()
+		) : null;
+		if (!indis) return false; 
+		if (vl===null||vl>9||vl<0) return [alert("Sadece 1 veya 0") || $("#vl").val(null)];
+		if (indis.length!=3||indis.indexOf("x")===-1) return false || $("#indis").val(null);
+		const [line, column] = [indis?.split("x")[0] ?? null, indis?.split("x")[1] ?? null];
+		if (!line||!column) return $("#indis").val(null);
+		return newMatris(line, column, vl);
+	});
+
+	const clearActive = () => {
+		$("#arr span").each(function(i,e) {
+			if ($(e).hasClass("active")) {
+				$(e).removeClass("active");
+			}			
+		});
+	}
+
+	$(document).on("click", "#arr span", function() {
+		let matris = this.dataset.matris 
+		? this.dataset.matris : null;
+		clearActive();
+		$(this).addClass("active");
+		$("#indis").val(matris);
+	});
+});
+</script>
+</html>
